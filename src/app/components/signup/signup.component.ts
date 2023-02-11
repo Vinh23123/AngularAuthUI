@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Route, Router } from '@angular/router';
 import ValidateForm from 'src/app/helpers/validateform';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -12,7 +14,7 @@ export class SignupComponent implements OnInit{
   isText: boolean = false;
   eyeIcon: string = "fa-eye-slash";
   signUpForm!: FormGroup; // khai báo loginform dưới dạng nhóm biểu mẫu
-  constructor(private fb: FormBuilder) {}//b4 đưa trình tạo mẫu vào constructor
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}//b4 đưa trình tạo mẫu vào constructor
 
   ngOnInit(): void{
       this.signUpForm = this.fb.group({
@@ -35,9 +37,21 @@ export class SignupComponent implements OnInit{
   onSignup(){
     if(this.signUpForm.valid){
       //send the object to database
+
+      this.auth.signUp(this.signUpForm.value)
+      .subscribe({
+        next:(res=>{
+          alert(res.message);
+          this.signUpForm.reset();
+          this.router.navigate(['login']);
+        })
+        ,error:(err=>{
+          alert(err?.error.message)
+        })
+      })
+
       console.log(this.signUpForm.value);
       
-
     }else{
       
       // logic  for throwing rror
